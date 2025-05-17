@@ -5,6 +5,40 @@ let categoriaSeleccionada = "all"; // Inicializar la categoría seleccionada com
 const inputBuscador = document.getElementById("buscador"); // Obtener el input del buscador
 const contendorCategorias = document.getElementById("categorias"); // Obtener el contenedor de categorías
 
+// logica de login
+
+document.addEventListener("DOMContentLoaded", () => {
+  const loginform = document.getElementById("login-form");
+  // si existe la variable loginform haz esto 
+  if (loginform) {
+    loginform.addEventListener("submit", async (e) => {
+      e.preventDefault(); // Prevenir el comportamiento por defecto del formulario no hacer que se recargue la página
+
+      const email = document.getElementById("email").value; // Obtener el valor del campo de email
+      const password = document.getElementById("password").value; // Obtener el valor del campo de password
+
+      try {
+        const response = await fetch("https://fakestoreapi.com/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }), // Enviar los datos como JSON
+        });
+
+        if (!response.ok) {
+          throw new Error("Error en la response de la API");
+        }
+
+        const data = await response.json(); // Convertir la response a JSON
+        console.log(data); // Mostrar la response en consola
+      } catch (error) {
+        console.error("Error al iniciar sesión:", error);
+      }
+    }); // Aquí faltaba cerrar el paréntesis del addEventListener
+  }
+});
+
 // Función para cargar productos desde la API
 async function cargarProductos() {
   try {
