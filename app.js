@@ -1,21 +1,22 @@
 const contenedorProductos = document.getElementById("productos");
 
-let productos = []; // Inicializar el array de productos
-let categoriaSeleccionada = "all"; // Inicializar la categoría seleccionada como "all"
+// let productos = []; // Inicializar el array de productos
+// let categoriaSeleccionada = "all"; // Inicializar la categoría seleccionada como "all"
 const inputBuscador = document.getElementById("buscador"); // Obtener el input del buscador
-const contendorCategorias = document.getElementById("categorias"); // Obtener el contenedor de categorías
+const contenedorCategorias = document.getElementById("categorias"); // Obtener el contenedor de categorías
 
 // logica de login
 
 document.addEventListener("DOMContentLoaded", () => {
-  const loginform = document.getElementById("login-form");
-  // si existe la variable loginform haz esto 
+  const loginform = document.getElementById("loginForm");
+  // si existe la variable loginform haz esto
   if (loginform) {
     loginform.addEventListener("submit", async (e) => {
       e.preventDefault(); // Prevenir el comportamiento por defecto del formulario no hacer que se recargue la página
 
-      const email = document.getElementById("email").value; // Obtener el valor del campo de email
+      const username = document.getElementById("username").value; // Obtener el valor del campo de username
       const password = document.getElementById("password").value; // Obtener el valor del campo de password
+      const mensaje = document.getElementById("mensaje");
 
       try {
         const response = await fetch("https://fakestoreapi.com/auth/login", {
@@ -23,19 +24,36 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password }), // Enviar los datos como JSON
+          body: JSON.stringify({ username, password }), // Enviar los datos como JSON
         });
 
         if (!response.ok) {
           throw new Error("Error en la response de la API");
         }
 
-        const data = await response.json(); // Convertir la response a JSON
-        console.log(data); // Mostrar la response en consola
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        mensaje.textContent = "Inicio de sesión exitoso";
+        mensaje.classList.add("text-green-500");
+
+        setTimeout(() => {
+          window.location.href = "index.html"; // Redirigir a la página principal
+        }, 1500);
       } catch (error) {
         console.error("Error al iniciar sesión:", error);
+        mensaje.textContent =
+          "Error al iniciar sesión. Verifica tus credenciales.";
+        mensaje.classList.add("text-red-500");
       }
     }); // Aquí faltaba cerrar el paréntesis del addEventListener
+  }
+  if (contenedorProductos && contenedorCategorias && inputBuscador) {
+    // Si los elementos existen, se ejecuta la lógica de productos
+    cargarProductos();
+    cargarCategorias();
+
+    //Agregar evento de búsqueda
+    inputBuscador.addEventListener("input", filtrarProductos);
   }
 });
 
@@ -63,14 +81,34 @@ async function cargarProductos() {
 }
 
 // Función para cargar y mostrar las categorías
+async function cargarCategorias() {
+  try {
+    const respuesta = await fetch(
+      "https://fakestoreapi.com/products/categories"
+    );
+
+    if (!respuesta.ok) {
+      throw new Error("Error en la respuesta de la API");
+    }
+
+    const categorias = await respuesta.json();
+    mostrarCategorias(["all", ...categorias]);
+  } catch (error) {
+    console.error("Error al cargar las categorías:", error);
+  }
+}
+
 function mostrarCategorias(categorias) {
-  contendorCategorias.innerHTML = ""; // Limpiar el contenedor de categorías
+  contenedorCategorias.innerHTML = ""; // Limpiar el contenedor de categorías
 
   categorias.forEach((cat) => {
     const btn = document.createElement("button");
-    btn.textContent = cat === "all" ? "Todos" : cat.charAt(0).toUpperCase() + cat.slice(1);
+    btn.textContent =
+      cat === "all" ? "Todos" : cat.charAt(0).toUpperCase() + cat.slice(1);
     btn.className = `px-4 py-2 rounded-full ${
-      categoriaSeleccionada === cat ? "bg-blue-500 text-white" : "bg-blue-200 text-blue-800"
+      categoriaSeleccionada === cat
+        ? "bg-blue-500 text-white"
+        : "bg-blue-200 text-blue-800"
     } hover:bg-blue-300 rounded-lg shadow-md transition-colors duration-300`;
 
     btn.addEventListener("click", () => {
@@ -79,7 +117,7 @@ function mostrarCategorias(categorias) {
       mostrarCategorias(categorias); // Actualizar las categorías
     });
 
-    contendorCategorias.appendChild(btn); // Agregar el botón de categoría al contenedor
+    contenedorCategorias.appendChild(btn); // Agregar el botón de categoría al contenedor
   });
 }
 
@@ -88,7 +126,9 @@ function filtrarProductos() {
   let pFiltrados = productos; // Inicializar el array filtrado con todos los productos
 
   if (categoriaSeleccionada !== "all") {
-    pFiltrados = productos.filter((producto) => producto.category === categoriaSeleccionada);
+    pFiltrados = productos.filter(
+      (producto) => producto.category === categoriaSeleccionada
+    );
   }
 
   const text = inputBuscador.value.toLowerCase(); // Obtener el texto del buscador en minúsculas
@@ -113,10 +153,14 @@ function mostrarProductos(productos) {
       "bg-white rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg transition-shadow duration-300";
 
     productoDIV.innerHTML = `
-      <img src="${producto.image}" alt="${producto.title}" class="w-32 h-32 object-contain mb-4">
+      <img src="${producto.image}" alt="${
+      producto.title
+    }" class="w-32 h-32 object-contain mb-4">
       <h3 class="text-lg font-bold text-gray-800 mb-2">${producto.title}</h3>
       <p class="text-gray-600 text-sm mb-2">${producto.description}</p>
-      <span class="text-blue-500 font-semibold">$${producto.price.toFixed(2)}</span>
+      <span class="text-blue-500 font-semibold">$${producto.price.toFixed(
+        2
+      )}</span>
     `;
 
     contenedorProductos.appendChild(productoDIV); // Agregar el producto al contenedor
