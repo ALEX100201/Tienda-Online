@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalle del Producto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 text-gray-800 min-h-screen flex items-center justify-center p-6">
+    <div id="detalle" class="bg-white shadow-lg rounded-lg p-6 max-w-2xl w-full"></div>
+
+    <script>
+      const contenedor = document.getElementById("detalle");
+      const params = new URLSearchParams(location.search);
+      const id = params.get("id");
+
+      if (!id) {
+        contenedor.innerHTML = "<p>ID de producto no válido.</p>";
+      } else {
+        fetch(`https://fakestoreapi.com/products/${id}`)
+          .then(res => res.json())
+          .then(producto => {
+            contenedor.innerHTML = `
+              <img src="${producto.image}" class="w-48 h-48 mx-auto mb-4 object-contain" />
+              <h2 class="text-2xl font-bold text-center mb-2">${producto.title}</h2>
+              <p class="text-center text-gray-500 mb-2">${producto.category}</p>
+              <p class="text-center text-gray-700 mb-4">${producto.description}</p>
+              <p class="text-center text-blue-600 font-bold text-xl mb-4">$${producto.price}</p>
+              <div class="text-center">
+                <a href="index.html" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">← Volver al catálogo</a>
+              </div>
+            `;
+          })
+          .catch(() => {
+            contenedor.innerHTML = "<p>Error al cargar el producto.</p>";
+          });
+      }
+    </script>
+  </body>
+</html>

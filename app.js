@@ -168,10 +168,18 @@ function mostrarProductos(productos) {
       <p class="descripcion text-gray-600 text-sm mb-2 hidden">${producto.description}</p>
     `;
 
+    // Evento para ver detalle al hacer clic en la tarjeta (excepto en el botón "More")
+    productoDiv.addEventListener("click", (e) => {
+      if (!e.target.classList.contains("more-btn")) {
+        window.location.href = `detalle.html?id=${producto.id}`;
+      }
+    });
+
     // Lógica para mostrar/ocultar descripción
     const btnMore = productoDiv.querySelector('.more-btn');
     const descripcion = productoDiv.querySelector('.descripcion');
-    btnMore.addEventListener('click', () => {
+    btnMore.addEventListener('click', (e) => {
+      e.stopPropagation(); // Evita que el click en el botón navegue al detalle
       descripcion.classList.toggle('hidden');
       btnMore.textContent = descripcion.classList.contains('hidden') ? 'More' : 'Less';
     });
