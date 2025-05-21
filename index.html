@@ -12,7 +12,7 @@
       <div
         class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center"
       >
-        <h1 class="text-3xl font-bold text-blue-600">Tienda Online</h1>
+        <h1 class="text-3xl font-extrabold text-blue-600">🛒 Mi Tienda</h1>
 
         <!-- Botón hamburguesa -->
         <button
@@ -30,6 +30,15 @@
           <a href="#" class="hover:text-blue-500">Productos</a>
           <a href="#" class="hover:text-blue-500">Contacto</a>
         </nav>
+
+        <!-- Botón de cerrar sesión alineado a la derecha -->
+        <button
+          id="logout"
+          class="flex items-center justify-center bg-red-800 text-white w-12 h-12 rounded-full hover:bg-red-900 transition text-2xl mr-4"
+          title="Cerrar sesión"
+        >
+          &#x23FB;
+        </button>
       </div>
     </header>
     <!-- Título Principal -->
@@ -48,7 +57,7 @@
           id="buscador"
           type="text"
           placeholder="Buscar productos..."
-          class="w-full max-w-md px-4 py-2 border-2 border-blue-400 rounded-lg "
+          class="w-full max-w-md px-4 py-2 border-2 border-blue-400 rounded-lg shadow "
         />
       </div>
     </section>
@@ -78,6 +87,8 @@
         &copy; 2025 Tienda Online. Todos los derechos reservados.
       </div>
     </footer>
+
+    
   </body>
   <script>
     if(!localStorage.getItem("token")){

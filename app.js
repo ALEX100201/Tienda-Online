@@ -8,6 +8,23 @@ const contenedorCategorias = document.getElementById("categorias"); // Obtener e
 // logica de login
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Redireccionar si no hay token y no estamos en login
+  if (!localStorage.getItem("token") && window.location.pathname.includes("index.html")) {
+    window.location.href = "login.html";
+  }
+
+  // Mostrar botón de logout si existe
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn && localStorage.getItem("token")) {
+    logoutBtn.classList.remove("hidden");
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    });
+  }
+
+
+
   const loginform = document.getElementById("loginForm");
   // si existe la variable loginform haz esto
   if (loginform) {
@@ -145,25 +162,31 @@ function filtrarProductos() {
 
 // Función para mostrar los productos en el contenedor
 function mostrarProductos(productos) {
-  contenedorProductos.innerHTML = ""; // Limpiar el contenedor antes de agregar nuevos productos
+  contenedorProductos.innerHTML = "";
 
   productos.forEach((producto) => {
-    const productoDIV = document.createElement("div");
-    productoDIV.className =
-      "bg-white rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg transition-shadow duration-300";
+    const productoDiv = document.createElement("div");
+    productoDiv.className =
+      "bg-white rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg transition duration-300 cursor-pointer hover:scale-105 border-2 border-blue-400";
 
-    productoDIV.innerHTML = `
-      <img src="${producto.image}" alt="${
-      producto.title
-    }" class="w-32 h-32 object-contain mb-4">
+    // Descripción oculta por defecto
+    productoDiv.innerHTML = `
+      <img src="${producto.image}" alt="${producto.title}" class="w-32 h-32 object-contain mb-4">
       <h3 class="text-lg font-bold text-gray-800 mb-2">${producto.title}</h3>
-      <p class="text-gray-600 text-sm mb-2">${producto.description}</p>
-      <span class="text-blue-500 font-semibold">$${producto.price.toFixed(
-        2
-      )}</span>
+      <span class="text-blue-500 font-semibold mb-2">$${producto.price.toFixed(2)}</span>
+      <button class="more-btn bg-blue-500 text-white px-3 py-1 rounded mb-2">More</button>
+      <p class="descripcion text-gray-600 text-sm mb-2 hidden">${producto.description}</p>
     `;
 
-    contenedorProductos.appendChild(productoDIV); // Agregar el producto al contenedor
+    // Lógica para mostrar/ocultar descripción
+    const btnMore = productoDiv.querySelector('.more-btn');
+    const descripcion = productoDiv.querySelector('.descripcion');
+    btnMore.addEventListener('click', () => {
+      descripcion.classList.toggle('hidden');
+      btnMore.textContent = descripcion.classList.contains('hidden') ? 'More' : 'Less';
+    });
+
+    contenedorProductos.appendChild(productoDiv);
   });
 }
 
