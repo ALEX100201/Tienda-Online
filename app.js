@@ -1,11 +1,9 @@
 const contenedorProductos = document.getElementById("productos");
+const inputBuscador = document.getElementById("buscador");
+const contenedorCategorias = document.getElementById("categorias");
 
-// let productos = []; // Inicializar el array de productos
-// let categoriaSeleccionada = "all"; // Inicializar la categoría seleccionada como "all"
-const inputBuscador = document.getElementById("buscador"); // Obtener el input del buscador
-const contenedorCategorias = document.getElementById("categorias"); // Obtener el contenedor de categorías
-
-// logica de login
+let productos = []; // Inicializar el array de productos
+let categoriaSeleccionada = "all"; // Inicializar la categoría seleccionada como "all"
 
 document.addEventListener("DOMContentLoaded", () => {
   // Redireccionar si no hay token y no estamos en login
@@ -23,16 +21,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
-
   const loginform = document.getElementById("loginForm");
-  // si existe la variable loginform haz esto
   if (loginform) {
     loginform.addEventListener("submit", async (e) => {
-      e.preventDefault(); // Prevenir el comportamiento por defecto del formulario no hacer que se recargue la página
+      e.preventDefault();
 
-      const username = document.getElementById("username").value; // Obtener el valor del campo de username
-      const password = document.getElementById("password").value; // Obtener el valor del campo de password
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
       const mensaje = document.getElementById("mensaje");
 
       try {
@@ -41,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, password }), // Enviar los datos como JSON
+          body: JSON.stringify({ username, password }),
         });
 
         if (!response.ok) {
@@ -54,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         mensaje.classList.add("text-green-500");
 
         setTimeout(() => {
-          window.location.href = "index.html"; // Redirigir a la página principal
+          window.location.href = "index.html";
         }, 1500);
       } catch (error) {
         console.error("Error al iniciar sesión:", error);
@@ -62,14 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
           "Error al iniciar sesión. Verifica tus credenciales.";
         mensaje.classList.add("text-red-500");
       }
-    }); // Aquí faltaba cerrar el paréntesis del addEventListener
+    });
   }
+
   if (contenedorProductos && contenedorCategorias && inputBuscador) {
-    // Si los elementos existen, se ejecuta la lógica de productos
     cargarProductos();
     cargarCategorias();
-
-    //Agregar evento de búsqueda
     inputBuscador.addEventListener("input", filtrarProductos);
   }
 });
@@ -83,14 +76,14 @@ async function cargarProductos() {
       throw new Error("Error en la respuesta de la API");
     }
 
-    productos = await respuesta.json(); // Convertir la respuesta a JSON
+    productos = await respuesta.json();
 
     if (productos.length === 0) {
       console.log("No se encontraron productos");
     } else {
-      mostrarProductos(productos); // Mostrar los productos
+      mostrarProductos(productos);
       const categorias = ["all", ...new Set(productos.map((p) => p.category))];
-      mostrarCategorias(categorias); // Mostrar las categorías
+      mostrarCategorias(categorias);
     }
   } catch (error) {
     console.error("Error al cargar los productos:", error);
@@ -116,7 +109,7 @@ async function cargarCategorias() {
 }
 
 function mostrarCategorias(categorias) {
-  contenedorCategorias.innerHTML = ""; // Limpiar el contenedor de categorías
+  contenedorCategorias.innerHTML = "";
 
   categorias.forEach((cat) => {
     const btn = document.createElement("button");
@@ -129,18 +122,17 @@ function mostrarCategorias(categorias) {
     } hover:bg-blue-300 rounded-lg shadow-md transition-colors duration-300`;
 
     btn.addEventListener("click", () => {
-      categoriaSeleccionada = cat; // Actualizar la categoría seleccionada
-      filtrarProductos(); // Filtrar los productos según la categoría seleccionada
-      mostrarCategorias(categorias); // Actualizar las categorías
+      categoriaSeleccionada = cat;
+      filtrarProductos();
+      mostrarCategorias(categorias);
     });
 
-    contenedorCategorias.appendChild(btn); // Agregar el botón de categoría al contenedor
+    contenedorCategorias.appendChild(btn);
   });
 }
 
-// Función para filtrar productos por categoría y texto del buscador
 function filtrarProductos() {
-  let pFiltrados = productos; // Inicializar el array filtrado con todos los productos
+  let pFiltrados = productos;
 
   if (categoriaSeleccionada !== "all") {
     pFiltrados = productos.filter(
@@ -148,19 +140,18 @@ function filtrarProductos() {
     );
   }
 
-  const text = inputBuscador.value.toLowerCase(); // Obtener el texto del buscador en minúsculas
+  const text = inputBuscador.value.toLowerCase();
   if (text.trim() !== "") {
     pFiltrados = pFiltrados.filter(
       (p) =>
-        p.title.toLowerCase().includes(text) || // Filtrar por título
-        p.description.toLowerCase().includes(text) // Filtrar por descripción
+        p.title.toLowerCase().includes(text) ||
+        p.description.toLowerCase().includes(text)
     );
   }
 
-  mostrarProductos(pFiltrados); // Mostrar los productos filtrados
+  mostrarProductos(pFiltrados);
 }
 
-// Función para mostrar los productos en el contenedor
 function mostrarProductos(productos) {
   contenedorProductos.innerHTML = "";
 
@@ -169,7 +160,6 @@ function mostrarProductos(productos) {
     productoDiv.className =
       "bg-white rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg transition duration-300 cursor-pointer hover:scale-105 border-2 border-blue-400";
 
-    // Descripción oculta por defecto
     productoDiv.innerHTML = `
       <img src="${producto.image}" alt="${producto.title}" class="w-32 h-32 object-contain mb-4">
       <h3 class="text-lg font-bold text-gray-800 mb-2">${producto.title}</h3>
@@ -189,11 +179,3 @@ function mostrarProductos(productos) {
     contenedorProductos.appendChild(productoDiv);
   });
 }
-
-// Evento para filtrar productos al escribir en el buscador
-inputBuscador.addEventListener("input", filtrarProductos);
-
-// Cargar los productos al cargar la página
-document.addEventListener("DOMContentLoaded", () => {
-  cargarProductos();
-});
