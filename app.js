@@ -62,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (contenedorProductos && contenedorCategorias && inputBuscador) {
     cargarProductos();
-    cargarCategorias();
     inputBuscador.addEventListener("input", filtrarProductos);
   }
 });
@@ -70,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Función para cargar productos desde la API
 async function cargarProductos() {
   try {
-    const respuesta = await fetch("https://fakestoreapi.com/products");
+    const respuesta = await fetch("http://127.0.0.1:8000/api/productos");
 
     if (!respuesta.ok) {
       throw new Error("Error en la respuesta de la API");
@@ -78,11 +77,20 @@ async function cargarProductos() {
 
     productos = await respuesta.json();
 
+    // Al cargar productos:
     if (productos.length === 0) {
       console.log("No se encontraron productos");
     } else {
       mostrarProductos(productos);
-      const categorias = ["all", ...new Set(productos.map((p) => p.category))];
+
+      // Extraer categorías únicas
+      const categoriasSet = new Set();
+      productos.forEach(p => {
+        if (Array.isArray(p.categorias)) {
+          p.categorias.forEach(cat => categoriasSet.add(cat.nombre));
+        }
+      });
+      const categorias = ["all", ...categoriasSet];
       mostrarCategorias(categorias);
     }
   } catch (error) {
@@ -94,7 +102,7 @@ async function cargarProductos() {
 async function cargarCategorias() {
   try {
     const respuesta = await fetch(
-      "https://fakestoreapi.com/products/categories"
+      "http://127.0.0.1:8000/api/productos"
     );
 
     if (!respuesta.ok) {
@@ -131,12 +139,16 @@ function mostrarCategorias(categorias) {
   });
 }
 
+
 function filtrarProductos() {
   let pFiltrados = productos;
 
+  // Filtrar productos por categoría seleccionada
   if (categoriaSeleccionada !== "all") {
     pFiltrados = productos.filter(
-      (producto) => producto.category === categoriaSeleccionada
+      (producto) =>
+        Array.isArray(producto.categorias) &&
+        producto.categorias.some(cat => cat.nombre === categoriaSeleccionada)
     );
   }
 
@@ -144,8 +156,8 @@ function filtrarProductos() {
   if (text.trim() !== "") {
     pFiltrados = pFiltrados.filter(
       (p) =>
-        p.title.toLowerCase().includes(text) ||
-        p.description.toLowerCase().includes(text)
+        p.nombre.toLowerCase().includes(text) ||
+        p.descripcion.toLowerCase().includes(text)
     );
   }
 
@@ -161,11 +173,11 @@ function mostrarProductos(productos) {
       "bg-white rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg transition duration-300 cursor-pointer hover:scale-105 border-2 border-blue-400";
 
     productoDiv.innerHTML = `
-      <img src="${producto.image}" alt="${producto.title}" class="w-32 h-32 object-contain mb-4">
-      <h3 class="text-lg font-bold text-gray-800 mb-2">${producto.title}</h3>
-      <span class="text-blue-500 font-semibold mb-2">$${producto.price.toFixed(2)}</span>
+      <img src="${producto.imagen}" alt="${producto.nombre}" class="w-32 h-32 object-contain mb-4">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">${producto.nombre}</h3>
+      <span class="text-blue-500 font-semibold mb-2">$${Number(producto.precio).toFixed(2)}</span>
       <button class="more-btn bg-blue-500 text-white px-3 py-1 rounded mb-2">More</button>
-      <p class="descripcion text-gray-600 text-sm mb-2 hidden">${producto.description}</p>
+      <p class="descripcion text-gray-600 text-sm mb-2 hidden">${producto.descripcion}</p>
     `;
 
     // Evento para ver detalle al hacer clic en la tarjeta (excepto en el botón "More")
