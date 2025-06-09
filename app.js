@@ -173,8 +173,8 @@ function mostrarProductos(productos) {
       "bg-white rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg transition duration-300 cursor-pointer hover:scale-105 border-2 border-blue-400";
 
     productoDiv.innerHTML = `
-      <img src="${producto.imagen}" alt="${producto.nombre}" class="w-32 h-32 object-contain mb-4">
-      <h3 class="text-lg font-bold text-gray-800 mb-2">${producto.nombre}</h3>
+      <img src="${producto.imagen}" alt="${producto.titulo}" class="w-32 h-32 object-contain mb-4">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">${producto.titulo}</h3>
       <span class="text-blue-500 font-semibold mb-2">$${Number(producto.precio).toFixed(2)}</span>
       <button class="more-btn bg-blue-500 text-white px-3 py-1 rounded mb-2">More</button>
       <p class="descripcion text-gray-600 text-sm mb-2 hidden">${producto.descripcion}</p>
