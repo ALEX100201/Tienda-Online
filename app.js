@@ -31,12 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const mensaje = document.getElementById("mensaje");
 
       try {
-        const response = await fetch("https://fakestoreapi.com/auth/login", {
+        const response = await fetch("http://127.0.0.1:8000/api/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ email:username, password }),
         });
 
         if (!response.ok) {
@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const data = await response.json();
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("role", data.role);
         mensaje.textContent = "Inicio de sesión exitoso";
         mensaje.classList.add("text-green-500");
 
